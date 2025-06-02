@@ -1,3 +1,14 @@
+---
+title: Email Pii Classifier
+emoji: 😻
+colorFrom: indigo
+colorTo: gray
+sdk: docker
+pinned: false
+license: apache-2.0
+short_description: EmailGuard created for Akaike by Nitin Prajwal!
+---
+
 # 📧 EmailGuard: Intelligent Classification & PII Shield API
 
 Welcome to EmailGuard created for Akaike by Nitin Prajwal! This project provides a robust API for classifying support emails and automatically masking sensitive Personally Identifiable Information (PII) and Payment Card Industry (PCI) data. It's designed to help support teams efficiently categorize inquiries while upholding strict data privacy standards.
