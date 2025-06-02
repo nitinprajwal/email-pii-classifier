@@ -1,6 +1,7 @@
 import logging
 from fastapi import FastAPI, HTTPException, APIRouter
 from pydantic import BaseModel
+from typing import List
 import uvicorn
 
 from config import CLASSIFICATION_MODEL_PATH, LOG_LEVEL, LOG_FORMAT
@@ -13,21 +14,21 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Email Classification and PII Masking API by nitinprajwal", version="1.0.0")
 
-# --- API Router for v1 --- #
-router_v1 = APIRouter(prefix="/api/v1")
+# --- API Router --- #
+router = APIRouter()
 
 # --- Pydantic Models for API --- #
 class EmailInput(BaseModel):
     input_email_body: str
 
 class MaskedEntity(BaseModel):
-    position: list[int]
+    position: List[int]
     classification: str
     entity: str
 
 class ClassificationOutput(BaseModel):
     input_email_body: str
-    list_of_masked_entities: list[MaskedEntity]
+    list_of_masked_entities: List[MaskedEntity]
     masked_email: str
     category_of_the_email: str
 
@@ -48,7 +49,7 @@ else:
 
 
 # --- Health Check Endpoint ---
-@router_v1.get("/health", tags=["Health"])
+@router.get("/health", tags=["Health"])
 async def health_check():
     logger.info("Health check endpoint called.")
     services = {
@@ -72,7 +73,7 @@ async def health_check():
             detail={"status": "error", "message": "One or more critical services are unavailable.", "services": services}
         )
 
-@router_v1.post("/classify", response_model=ClassificationOutput, tags=["Classification"])
+@router.post("/classify", response_model=ClassificationOutput, tags=["Classification"])
 async def classify_email_endpoint(email_input: EmailInput):
     logger.info(f"Received request for /classify. Email length: {len(email_input.input_email_body)}")
     if len(email_input.input_email_body) == 0:
@@ -117,7 +118,7 @@ async def classify_email_endpoint(email_input: EmailInput):
     )
 
 # Include the router in the main app instance
-app.include_router(router_v1)
+app.include_router(router)
 
 if __name__ == "__main__":
     # Note: Hugging Face Spaces will use its own command to run the app.

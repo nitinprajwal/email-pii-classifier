@@ -19,6 +19,7 @@ PEP8 compliant and includes detailed comments.
 """
 import re
 import spacy
+from typing import Tuple, List, Dict
 
 # Load spaCy model
 try:
@@ -27,8 +28,8 @@ except OSError:
     print("spaCy model 'en_core_web_sm' not found. Please run: python -m spacy download en_core_web_sm")
     # Depending on the environment, you might want to exit or raise an error here
     # For Hugging Face Spaces, the model should be downloaded during setup if specified.
-        nlp = None  # Fallback: spaCy features will be unavailable.
-                # In a production system, this might warrant an error or specific handling.
+    nlp = None  # Fallback: spaCy features will be unavailable.
+    # In a production system, this might warrant an error or specific handling.
 
 
 # --- PII Regex Patterns --- #
@@ -62,7 +63,7 @@ ENTITY_MAP = {
     "expiry_no": "[expiry_no]",
 }
 
-def mask_pii_details(text: str, nlp_model=None) -> tuple[str, list[dict]]:
+def mask_pii_details(text: str, nlp_model=None) -> Tuple[str, List[Dict]]:
     """
     Masks PII in the input text using a combination of regex patterns and spaCy NER.
 
@@ -81,11 +82,11 @@ def mask_pii_details(text: str, nlp_model=None) -> tuple[str, list[dict]]:
                                                     Defaults to None.
 
     Returns:
-        tuple[str, list[dict]]:
+        Tuple[str, List[Dict]]:
             - masked_text (str): The text with PII entities replaced by placeholders.
-            - found_entities (list[dict]): A list of dictionaries, where each dictionary
+            - found_entities (List[Dict]): A list of dictionaries, where each dictionary
               represents a detected PII entity and contains:
-                - "position" (list[int, int]): Start and end indices in the original text.
+                - "position" (List[int]): Start and end indices in the original text.
                 - "classification" (str): The type of PII (e.g., "email", "full_name").
                 - "entity" (str): The original detected PII value.
     """
@@ -223,7 +224,7 @@ def mask_pii_details(text: str, nlp_model=None) -> tuple[str, list[dict]]:
 
     return masked_text, found_entities
 
-def demask_pii(masked_text: str, pii_entities: list[dict]) -> str:
+def demask_pii(masked_text: str, pii_entities: List[Dict]) -> str:
     """
     Conceptually restores PII to a masked text string.
 
@@ -241,7 +242,7 @@ def demask_pii(masked_text: str, pii_entities: list[dict]) -> str:
 
     Args:
         masked_text (str): The text string where PII has been replaced by placeholders.
-        pii_entities (list[dict]): A list of dictionaries, where each dictionary
+        pii_entities (List[Dict]): A list of dictionaries, where each dictionary
                                  describes a masked PII entity, including its original
                                  value and type (as returned by `mask_pii_details`).
 

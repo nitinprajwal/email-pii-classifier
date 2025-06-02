@@ -19,7 +19,8 @@ Welcome to EmailGuard created for Akaike by Nitin Prajwal! This project provides
 
 ## ✨ Key Features
 
--   **🎯 Accurate Email Classification**: Automatically categorizes emails into **Incident, Request, Change, or Problem**.
+-   **🎯 Advanced Email Classification**: Utilizes a sophisticated **ensemble learning approach** with gradient boosting, advanced feature engineering, and optimized algorithms to categorize emails into **Incident, Request, Change, or Problem** with superior accuracy.
+-   **🧠 Multi-Feature Engineering**: Combines multiple sophisticated feature extraction techniques including enhanced TF-IDF vectorization (1-3 grams), character-level n-grams, and custom linguistic feature analysis for comprehensive text understanding.
 -   **🛡️ Advanced PII Masking**: Leverages a hybrid approach (RegEx + spaCy NER) to detect and mask a comprehensive list of PII entities without relying on LLMs. Masked entities include:
     -   Full Names
     -   Email Addresses

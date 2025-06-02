@@ -6,8 +6,9 @@ parts of the project, such as data loading, preprocessing, or other shared tasks
 It aims to promote code reusability and organization.
 """
 import pandas as pd
+from typing import Union
 
-def load_data(file_path: str) -> pd.DataFrame | None:
+def load_data(file_path: str) -> Union[pd.DataFrame, None]:
     """
     Loads data from a specified CSV file into a pandas DataFrame.
 
@@ -15,7 +16,7 @@ def load_data(file_path: str) -> pd.DataFrame | None:
         file_path (str): The absolute or relative path to the CSV file.
 
     Returns:
-        pd.DataFrame | None: A pandas DataFrame containing the loaded data if successful,
+        Union[pd.DataFrame, None]: A pandas DataFrame containing the loaded data if successful,
                              with 'email' and 'type' columns validated.
                              Returns None if any error occurs during loading or validation
                              (e.g., file not found, empty file, missing required columns).
@@ -61,4 +62,3 @@ if __name__ == "__main__":
         print(email_data.head())
         print("\nEmail categories distribution:")
         print(email_data['type'].value_counts())
-

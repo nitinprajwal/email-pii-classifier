@@ -1,21 +1,7 @@
-# Web Framework
 fastapi==0.110.0
 uvicorn[standard]==0.29.0
-
-# Data Handling
 pandas==1.5.3
-
-# Machine Learning (for email classification model)
-scikit-learn==1.3.2
-
-# NLP
-# spaCy for Named Entity Recognition (NER)
-# Version 3.8.0 is chosen for compatibility with en_core_web_sm-3.8.0 model.
-spacy==3.8.0
-
-# NLTK (potentially for tokenization or other non-LLM NLP tasks)
+scikit-learn==1.6.1
+spacy==3.7.4
 nltk==3.8.1
-
-# spaCy English Model (small) - Pinned to a specific version from GitHub releases
-# This is en_core_web_sm version 3.8.0. It requires a compatible spaCy version (e.g., spaCy 3.8.x).
-en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl

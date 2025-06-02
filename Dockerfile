@@ -8,17 +8,16 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install dependencies
-# The en_core_web_sm model might be installed via requirements.txt if specified with a URL.
-# Running `python -m spacy download en_core_web_sm` ensures it's available.
-RUN pip install --no-cache-dir -r requirements.txt && \
-    python -m spacy download en_core_web_sm
+# The en_core_web_sm model is installed via requirements.txt as it's specified with a URL.
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
 # This includes app.py, pii_masking.py, email_classifier.joblib, etc.
 # Ensure .dockerignore is used to exclude unnecessary files.
 COPY . .
 
-# Hugging Face Spaces will use the Procfile to run the application.
-# The Procfile should be: web: uvicorn app:app --host 0.0.0.0 --port $PORT
-# The $PORT environment variable will be set by Hugging Face Spaces,
-# based on the `app_port` in the README.md YAML (e.g., 7860).
+# Expose port 7860 for Hugging Face Spaces
+EXPOSE 7860
+
+# Run the FastAPI application with uvicorn
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]

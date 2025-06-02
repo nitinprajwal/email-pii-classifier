@@ -14,6 +14,7 @@ Test cases are designed to ensure:
 - Adherence to expected output formats for masked text and entity lists.
 """
 import unittest
+from typing import List, Dict
 from pii_masking import mask_pii_details, nlp as spacy_nlp_model, PII_PATTERNS, ENTITY_MAP
 
 class TestPiiMasking(unittest.TestCase):
@@ -38,7 +39,7 @@ class TestPiiMasking(unittest.TestCase):
             print("Warning: spaCy model ('en_core_web_sm') not loaded. "
                   "NER-dependent tests might behave differently or be skipped.")
 
-    def assertMasking(self, text: str, expected_masked_text: str, expected_entities_details: list[dict]):
+    def assertMasking(self, text: str, expected_masked_text: str, expected_entities_details: List[Dict]):
         """
         Helper method to perform PII masking and assert the results.
 
@@ -48,7 +49,7 @@ class TestPiiMasking(unittest.TestCase):
         Args:
             text (str): The input text to be masked.
             expected_masked_text (str): The expected string after PII masking.
-            expected_entities_details (list[dict]): A list of dictionaries, where each
+            expected_entities_details (List[Dict]): A list of dictionaries, where each
                 dictionary represents an expected PII entity with its 'position',
                 'classification', and 'entity' (original value).
         """

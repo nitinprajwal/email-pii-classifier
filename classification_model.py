@@ -1,21 +1,33 @@
 # classification_model.py - Developed by nitinprajwal
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split # Optional: for evaluating model
-from sklearn.metrics import classification_report # Optional: for evaluating model
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.base import BaseEstimator, TransformerMixin
 import pandas as pd
 import joblib
 import os
+import numpy as np
+import re
+from collections import Counter
 
 # Assuming utils.py is in the same directory
 from utils import load_data
 # Import PII masking functionality
 from pii_masking import mask_pii_details, nlp as spacy_nlp_model_for_training # Use the loaded spaCy model
+# Import the advanced feature extractor
+from feature_extractor import AdvancedTextFeatureExtractor
 
 from config import CLASSIFICATION_MODEL_PATH
 MODEL_FILENAME = CLASSIFICATION_MODEL_PATH
 DEFAULT_DATASET_PATH = "combined_emails_with_natural_pii.csv"
+
+# AdvancedTextFeatureExtractor is now imported from feature_extractor.py
 
 def train_classification_model(data_path: str = DEFAULT_DATASET_PATH, model_save_path: str = MODEL_FILENAME):
     """
@@ -64,12 +76,39 @@ def train_classification_model(data_path: str = DEFAULT_DATASET_PATH, model_save
     # Optional: Split data for evaluation (not strictly required by assignment but good practice)
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-    # Create a pipeline: TF-IDF Vectorizer -> Multinomial Naive Bayes
-    # You can experiment with other models like SVM, Logistic Regression, or even simple Transformers.
+    # Cross-version compatible model optimized for deployment
+    print("Building deployment-compatible advanced model...")
+    
+    # Simple but effective pipeline using stable scikit-learn components
     model = Pipeline([
-        ('tfidf', TfidfVectorizer(stop_words='english', max_df=0.95, min_df=2, ngram_range=(1,2))),
-        ('clf', MultinomialNB(alpha=0.1)), # Alpha is a smoothing parameter for Naive Bayes
+        # Enhanced TF-IDF with optimized parameters for better classification
+        ('tfidf', TfidfVectorizer(
+            stop_words='english',
+            max_df=0.85,
+            min_df=2,
+            ngram_range=(1,3),  # Unigrams, bigrams, and trigrams
+            max_features=5000,  # Balanced feature count
+            sublinear_tf=True,  # Apply sublinear tf scaling
+            norm='l2',
+            strip_accents='unicode',
+            lowercase=True,
+            token_pattern=r'\b[a-zA-Z]+\b'  # Only alphabetic tokens
+        )),
+        # Random Forest - highly compatible and robust across versions
+        ('classifier', RandomForestClassifier(
+            n_estimators=100,  # Good balance of performance and speed
+            max_depth=15,  # Prevent overfitting
+            min_samples_split=5,
+            min_samples_leaf=2,
+            max_features='sqrt',  # Feature sampling
+            random_state=42,
+            class_weight='balanced',  # Handle class imbalance
+            n_jobs=1  # Single job for compatibility
+        ))
     ])
+    
+    print("Compatible model created: Enhanced TF-IDF (1-3 grams) + Random Forest")
+    print("Optimized for cross-version compatibility and deployment stability")
 
     print("Training the model...")
     # model.fit(X_train, y_train) # If using train_test_split
@@ -159,4 +198,3 @@ if __name__ == "__main__":
                 print(f"-> Predicted: {category} (Expected: {expected_category})")
     else:
         print("Model training failed. Cannot proceed with testing.")
-
