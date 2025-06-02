@@ -1,0 +1,51 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main # IMPORTANT: Change this if your default branch is not 'main' (e.g., 'master')
+
+env:
+  HF_USERNAME: nitinprajwal
+  HF_SPACE_NAME: email-pii-classifier
+  # Note: HF_TOKEN is supplied via GitHub Secrets
+
+jobs:
+  deploy_to_hf_space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Using latest version
+
+      - name: Set up Git configuration
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+      - name: Clone Hugging Face Space repository
+        run: |
+          git clone "https://user:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/${{ env.HF_USERNAME }}/${{ env.HF_SPACE_NAME }}" hf_space_clone_dir
+        # We clone into a subdirectory `hf_space_clone_dir` within $GITHUB_WORKSPACE
+
+      - name: Synchronize files to Hugging Face Space clone
+        run: |
+          cd hf_space_clone_dir
+          # Clean the working directory of the clone, leaving .git directory untouched
+          # This ensures that files deleted in the source repo are removed from the target.
+          find . -maxdepth 1 -path './.git' -prune -o -exec rm -rf '{}' +
+          
+          # Copy all files from the source repository to the clone's working directory.
+          # Exclude the .git directory of the source and the clone directory itself.
+          rsync -av --exclude='.git/' --exclude='hf_space_clone_dir/' $GITHUB_WORKSPACE/ ./
+
+      - name: Commit and Push to Hugging Face Space
+        run: |
+          cd hf_space_clone_dir
+          git add .
+          # Commit only if there are staged changes
+          if ! git diff --staged --quiet; then
+            git commit -m "Automated deployment from GitHub Actions (commit: ${{ github.sha }})"
+            git push origin main # Assuming the HF Space repo also uses 'main' branch
+          else
+            echo "No changes to deploy to Hugging Face Space."
+          fi
