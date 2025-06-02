@@ -1,0 +1,28 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Python virtual environments and cache
+venv/
+myenv/
+*.pyc
+__pycache__/
+.env
+
+# Large datasets not needed at runtime
+combined_emails_with_natural_pii.csv
+
+# Test files (if not needed in production image)
+# test_*.py
+# tests/
+
+# IDE and OS specific files
+.idea/
+.vscode/
+.DS_Store
+
+# Local development artifacts
+*.log
+*.db
+*.sqlite3
