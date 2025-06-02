@@ -30,13 +30,15 @@ jobs:
       - name: Synchronize files to Hugging Face Space clone
         run: |
           cd hf_space_clone_dir
-          # Clean the working directory of the clone, leaving .git directory untouched
-          # This ensures that files deleted in the source repo are removed from the target.
-          find . -maxdepth 1 -path './.git' -prune -o -exec rm -rf '{}' +
+          # Clean the working directory: find files/dirs at root (excluding .git) and remove them.
+          # -print0 and xargs -0 handle special characters in filenames.
+          # xargs -r (or --no-run-if-empty) ensures rm is not called if find returns nothing.
+          find . -mindepth 1 -maxdepth 1 -not -name ".git" -print0 | xargs -0 -r rm -rf --
           
-          # Copy all files from the source repository to the clone's working directory.
-          # Exclude the .git directory of the source and the clone directory itself.
-          rsync -av --exclude='.git/' --exclude='hf_space_clone_dir/' $GITHUB_WORKSPACE/ ./
+          # Copy all files from the source repository ($GITHUB_WORKSPACE, which is parent of hf_space_clone_dir)
+          # to the current directory (hf_space_clone_dir).
+          # Exclude .git from source, .github from source, and the clone directory itself from source.
+          rsync -av --exclude='.git/' --exclude='.github/' --exclude='hf_space_clone_dir/' $GITHUB_WORKSPACE/ ./
 
       - name: Commit and Push to Hugging Face Space
         run: |
